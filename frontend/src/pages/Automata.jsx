@@ -1,0 +1,187 @@
+import { useEffect, useState } from 'react';
+import { GitBranch, ArrowRight } from 'lucide-react';
+import { getRules, getAutomaton } from '../services/api';
+import { ProtocolBadge, ActionBadge } from '../components/Badge';
+
+/** Very simple SVG-based automaton graph */
+function AutomatonGraph({ automaton }) {
+  if (!automaton) return null;
+  const { states, transitions, initial_state, accepting_states, dead_states } = automaton;
+
+  // Assign x/y positions in a horizontal flow
+  const step = Math.max(90, 560 / Math.max(states.length, 1));
+  const positions = {};
+  states.forEach((s, i) => {
+    positions[s] = { x: 40 + i * step, y: 100 };
+  });
+
+  const stateColor = (s) => {
+    if (accepting_states.includes(s)) return 'var(--clr-success)';
+    if (dead_states.includes(s))      return 'var(--clr-danger)';
+    if (s === initial_state)          return 'var(--clr-accent)';
+    return 'var(--clr-border-2)';
+  };
+
+  const width = 40 + states.length * step + 40;
+
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <svg width={width} height={220} style={{ fontFamily: 'var(--font-mono)' }}>
+        {/* Transitions */}
+        {transitions.map((t, i) => {
+          const from = positions[t.from];
+          const to   = positions[t.to];
+          if (!from || !to) return null;
+          const isSelf  = t.from === t.to;
+          const midX    = (from.x + to.x) / 2;
+          const midY    = from.y - 40;
+          return (
+            <g key={i}>
+              {isSelf ? (
+                <path d={`M${from.x},${from.y - 18} A22,22 0 1 1 ${from.x + 1},${from.y - 18}`}
+                  fill="none" stroke="var(--clr-border-2)" strokeWidth={1.5} markerEnd="url(#arrow)" />
+              ) : (
+                <path d={`M${from.x + 18},${from.y} Q${midX},${midY} ${to.x - 18},${to.y}`}
+                  fill="none" stroke="var(--clr-border-2)" strokeWidth={1.5} markerEnd="url(#arrow)" />
+              )}
+              <text x={midX} y={midY - 6} textAnchor="middle" fontSize={9} fill="var(--clr-text-dim)">
+                {t.label}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Arrow marker */}
+        <defs>
+          <marker id="arrow" markerWidth={8} markerHeight={8} refX={6} refY={3} orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--clr-border-2)" />
+          </marker>
+        </defs>
+
+        {/* States */}
+        {states.map((s) => {
+          const p = positions[s];
+          return (
+            <g key={s}>
+              <circle cx={p.x} cy={p.y} r={18}
+                fill="var(--clr-surface-2)"
+                stroke={stateColor(s)}
+                strokeWidth={accepting_states.includes(s) ? 2.5 : 1.5} />
+              {accepting_states.includes(s) && (
+                <circle cx={p.x} cy={p.y} r={14} fill="none" stroke={stateColor(s)} strokeWidth={1} />
+              )}
+              <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle"
+                fontSize={9} fill="var(--clr-text)" fontWeight={600}>{s}</text>
+              {s === initial_state && (
+                <polygon points={`${p.x - 28},${p.y} ${p.x - 22},${p.y - 5} ${p.x - 22},${p.y + 5}`}
+                  fill="var(--clr-accent)" />
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      {/* Legend */}
+      <div className="chip-list" style={{ marginTop:8 }}>
+        {[
+          { color:'var(--clr-accent)',   label:'Initial'  },
+          { color:'var(--clr-success)',  label:'Accept'   },
+          { color:'var(--clr-danger)',   label:'Reject'   },
+          { color:'var(--clr-border-2)',label:'Normal'   },
+        ].map(l => (
+          <span key={l.label} style={{ display:'flex', alignItems:'center', gap:5, fontSize:'0.72rem', color:'var(--clr-text-muted)' }}>
+            <span style={{ width:10, height:10, borderRadius:'50%', background:l.color, display:'inline-block' }} />
+            {l.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function Automata() {
+  const [rules, setRules]       = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [automaton, setAutomaton] = useState(null);
+  const [loading, setLoading]   = useState(false);
+
+  useEffect(() => { getRules().then(setRules); }, []);
+
+  const handleSelect = async (rule) => {
+    setSelected(rule);
+    setAutomaton(null);
+    setLoading(true);
+    const a = await getAutomaton(rule.id);
+    setAutomaton(a);
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1><GitBranch size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Automata Visualizer</h1>
+        <p>Select a rule to inspect its DFA representation. States, transitions, and accept/reject conditions are shown.</p>
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'260px 1fr', gap:20 }}>
+        {/* Rule list panel */}
+        <div className="card" style={{ padding:0, overflow:'hidden' }}>
+          <div style={{ padding:'14px 16px', borderBottom:'1px solid var(--clr-border)', fontSize:'0.78rem', fontWeight:700, color:'var(--clr-text-muted)', textTransform:'uppercase', letterSpacing:'0.7px' }}>
+            Select Rule
+          </div>
+          {rules.map(r => (
+            <button key={r.id}
+              onClick={() => handleSelect(r)}
+              style={{
+                display:'flex', alignItems:'center', gap:10, width:'100%', padding:'12px 16px',
+                background: selected?.id === r.id ? 'rgba(79,142,247,0.1)' : 'transparent',
+                borderLeft: selected?.id === r.id ? '3px solid var(--clr-accent)' : '3px solid transparent',
+                color: selected?.id === r.id ? 'var(--clr-accent)' : 'var(--clr-text-muted)',
+                border:'none', borderBottom:'1px solid var(--clr-border)', cursor:'pointer',
+                fontFamily:'var(--font-mono)', fontSize:'0.82rem', textAlign:'left',
+                transition:'all 0.15s',
+              }}>
+              <span style={{ fontWeight:700, minWidth:30 }}>{r.id}</span>
+              <span style={{ fontSize:'0.75rem', color:'var(--clr-text-dim)' }}>p{r.priority}</span>
+              <ActionBadge action={r.action} />
+            </button>
+          ))}
+        </div>
+
+        {/* Automaton panel */}
+        <div className="card">
+          {!selected && (
+            <div className="empty-state">
+              <GitBranch size={40} />
+              <p>Select a rule from the list to visualize its automaton.</p>
+            </div>
+          )}
+          {selected && loading && (
+            <div className="animate-pulse" style={{ height:200, borderRadius:'var(--radius)' }} />
+          )}
+          {selected && !loading && automaton && (
+            <>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
+                <span style={{ fontFamily:'var(--font-mono)', fontWeight:700, color:'var(--clr-accent)' }}>{automaton.rule_id}</span>
+                <ProtocolBadge protocol={selected.protocol} />
+                <ActionBadge action={selected.action} />
+                <span className="mono text-sm">{selected.source} → {selected.destination}</span>
+              </div>
+              <AutomatonGraph automaton={automaton} />
+              <div style={{ marginTop:16, padding:14, background:'var(--clr-surface-2)', borderRadius:'var(--radius-sm)' }}>
+                <div className="text-xs text-muted" style={{ marginBottom:6, fontWeight:700 }}>TRANSITIONS</div>
+                {automaton.transitions.map((t, i) => (
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:6, fontSize:'0.78rem', padding:'3px 0' }}>
+                    <span className="mono" style={{ color:'var(--clr-accent)' }}>{t.from}</span>
+                    <ArrowRight size={10} color="var(--clr-text-dim)" />
+                    <span className="mono" style={{ color:'var(--clr-accent)' }}>{t.to}</span>
+                    <span className="chip" style={{ fontSize:'0.68rem' }}>{t.label}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
