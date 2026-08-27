@@ -1,3 +1,4 @@
+from typing import Optional
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -17,6 +18,6 @@ class Rule(BaseModel):
     source: str = Field(..., description="Source IP, CIDR, or ANY")
     destination: str = Field(..., description="Destination IP, CIDR, or ANY")
     protocol: Protocol = Field(..., description="Network protocol")
-    source_port: str = Field(..., description="Single port, port range (e.g., 80-100), or ANY")
-    destination_port: str = Field(..., description="Single port, port range (e.g., 80-100), or ANY")
+    source_port: Optional[str] = Field(None, description="Single port, port range (e.g., 80-100), or ANY")
+    destination_port: Optional[str] = Field(None, description="Single port, port range (e.g., 80-100), or ANY")
     action: Action = Field(..., description="Action to take: ALLOW or DENY")
