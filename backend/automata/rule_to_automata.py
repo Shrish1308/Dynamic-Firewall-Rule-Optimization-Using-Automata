@@ -55,6 +55,8 @@ def rule_to_dfa(rule: Rule) -> DFA:
     
     # 4. Source Port Transition (q3 -> q4)
     def check_sport(p: Packet) -> bool:
+        if p.source_port is None:
+            return True
         return sport_start <= p.source_port <= sport_end
         
     sport_label = "sport=ANY" if rule.source_port in (None, "ANY", "null", "") else f"sport={rule.source_port}"
@@ -64,6 +66,8 @@ def rule_to_dfa(rule: Rule) -> DFA:
     
     # 5. Destination Port Transition (q4 -> ACCEPT/REJECT)
     def check_dport(p: Packet) -> bool:
+        if p.destination_port is None:
+            return True
         return dport_start <= p.destination_port <= dport_end
         
     dport_label = "dport=ANY" if rule.destination_port in (None, "ANY", "null", "") else f"dport={rule.destination_port}"

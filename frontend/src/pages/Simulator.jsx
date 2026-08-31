@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Play, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import { simulatePacket } from '../services/api';
-import { ActionBadge, ProtocolBadge } from '../components/Badge';
+import { ActionBadge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 
@@ -12,6 +12,7 @@ export default function Simulator() {
   const [result, setResult]     = useState(null);
   const [loading, setLoading]   = useState(false);
   const [errors, setErrors]     = useState({});
+  const [submitError, setSubmitError] = useState('');
 
   const validate = (p) => {
     const e = {};
@@ -24,15 +25,22 @@ export default function Simulator() {
     const e = validate(packet);
     if (Object.keys(e).length) { setErrors(e); return; }
     setErrors({});
+    setSubmitError('');
     setLoading(true);
     const payload = {
       ...packet,
       source_port:      packet.source_port      !== '' ? Number(packet.source_port)      : null,
       destination_port: packet.destination_port !== '' ? Number(packet.destination_port) : null,
     };
-    const r = await simulatePacket(payload);
-    setResult(r);
-    setLoading(false);
+    try {
+      const r = await simulatePacket(payload);
+      setResult(r);
+    } catch (error) {
+      setSubmitError(error.message || 'Unable to simulate packet');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const f = (field) => (e) => setPacket(p => ({ ...p, [field]: e.target.value }));
@@ -80,6 +88,7 @@ export default function Simulator() {
             {loading ? 'Simulating…' : 'Run Simulation'}
           </Button>
         </div>
+        {submitError && <div className="form-error" style={{ marginTop: 12 }}>{submitError}</div>}
       </Card>
 
       {/* Result */}

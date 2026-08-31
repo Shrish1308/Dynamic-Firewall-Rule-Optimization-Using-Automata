@@ -9,7 +9,10 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 async function handleResponse(response) {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    const detail = Array.isArray(errorData.detail)
+      ? errorData.detail.map((err) => `${err.loc?.join('.')}: ${err.msg}`).join('; ')
+      : errorData.detail;
+    throw new Error(detail || `HTTP error! status: ${response.status}`);
   }
   return await response.json();
 }

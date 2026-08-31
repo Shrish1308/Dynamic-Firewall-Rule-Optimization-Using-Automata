@@ -83,13 +83,15 @@ export default function Rules() {
   const [editTarget, setEditTarget] = useState(null); // null = new rule
   const [formData, setFormData] = useState(EMPTY_RULE);
   const [formErrors, setFormErrors] = useState({});
+  const [saveError, setSaveError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const load = () => { setLoading(true); getRules().then(r => { setRules(r); setLoading(false); }); };
-  useEffect(load, []);
+  useEffect(() => {
+    getRules().then(r => { setRules(r); setLoading(false); });
+  }, []);
 
-  const openNew  = () => { setEditTarget(null); setFormData(EMPTY_RULE); setFormErrors({}); setFormOpen(true); };
-  const openEdit = (rule) => { setEditTarget(rule); setFormData({ ...rule, source_port: rule.source_port ?? '', destination_port: rule.destination_port ?? '' }); setFormErrors({}); setFormOpen(true); };
+  const openNew  = () => { setEditTarget(null); setFormData(EMPTY_RULE); setFormErrors({}); setSaveError(''); setFormOpen(true); };
+  const openEdit = (rule) => { setEditTarget(rule); setFormData({ ...rule, source_port: rule.source_port ?? '', destination_port: rule.destination_port ?? '' }); setFormErrors({}); setSaveError(''); setFormOpen(true); };
 
   const handleSave = async () => {
     const errs = validate(formData);
@@ -97,17 +99,22 @@ export default function Rules() {
     const payload = {
       ...formData,
       priority: Number(formData.priority),
-      source_port: formData.source_port !== '' ? Number(formData.source_port) : null,
-      destination_port: formData.destination_port !== '' ? Number(formData.destination_port) : null,
+      source_port: formData.source_port !== '' && formData.source_port !== null ? String(formData.source_port) : null,
+      destination_port: formData.destination_port !== '' && formData.destination_port !== null ? String(formData.destination_port) : null,
     };
-    if (editTarget) {
-      const updated = await updateRule(editTarget.id, payload);
-      setRules(r => r.map(x => x.id === editTarget.id ? updated : x));
-    } else {
-      const created = await createRule(payload);
-      setRules(r => [...r, created]);
+    try {
+      setSaveError('');
+      if (editTarget) {
+        const updated = await updateRule(editTarget.id, payload);
+        setRules(r => r.map(x => x.id === editTarget.id ? updated : x));
+      } else {
+        const created = await createRule(payload);
+        setRules(r => [...r, created]);
+      }
+      setFormOpen(false);
+    } catch (error) {
+      setSaveError(error.message || 'Unable to save rule');
     }
-    setFormOpen(false);
   };
 
   const handleDelete = async () => {
@@ -169,6 +176,7 @@ export default function Rules() {
           </>
         }
       >
+        {saveError && <div className="form-error" style={{ marginBottom: 12 }}>{saveError}</div>}
         <RuleForm value={formData} onChange={setFormData} errors={formErrors} />
       </Modal>
 

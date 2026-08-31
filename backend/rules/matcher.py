@@ -33,17 +33,19 @@ def packet_matches_rule(packet: Packet, rule: Rule) -> bool:
         
     # 4. Source Port Match
     try:
-        rule_sport_start, rule_sport_end = parse_port(rule.source_port)
-        if not (rule_sport_start <= packet.source_port <= rule_sport_end):
-            return False
+        if packet.source_port is not None:
+            rule_sport_start, rule_sport_end = parse_port(rule.source_port)
+            if not (rule_sport_start <= packet.source_port <= rule_sport_end):
+                return False
     except ValueError:
         return False
         
     # 5. Destination Port Match
     try:
-        rule_dport_start, rule_dport_end = parse_port(rule.destination_port)
-        if not (rule_dport_start <= packet.destination_port <= rule_dport_end):
-            return False
+        if packet.destination_port is not None:
+            rule_dport_start, rule_dport_end = parse_port(rule.destination_port)
+            if not (rule_dport_start <= packet.destination_port <= rule_dport_end):
+                return False
     except ValueError:
         return False
         

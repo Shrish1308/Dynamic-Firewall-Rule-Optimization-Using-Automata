@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, AlertTriangle, Zap, Play, BarChart2, GitBranch, ChevronRight } from 'lucide-react';
 import { StatCard } from '../components/Card';
-import { ActionBadge, IssueBadge } from '../components/Badge';
+import { IssueBadge } from '../components/Badge';
 import { getRules, getAnalysis } from '../services/api';
 
 export default function Dashboard() {
@@ -60,7 +60,7 @@ export default function Dashboard() {
             subtitle={`${analysis?.summary.conflict ?? 0} conflict · ${analysis?.summary.shadowed ?? 0} shadow`} />
           <StatCard title="Unreachable" value={analysis?.summary.unreachable ?? 0} icon={GitBranch}
             iconColor="var(--clr-accent-2)" iconBg="rgba(167,139,250,0.12)" />
-          <StatCard title="Redundant" value={analysis?.summary.redundant ?? 0} icon={BarChart2}
+          <StatCard title="Redundant" value={analysis?.summary.redundancy ?? 0} icon={BarChart2}
             iconColor="var(--clr-success)" iconBg="rgba(52,211,153,0.12)" />
         </div>
       )}

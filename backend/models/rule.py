@@ -13,7 +13,7 @@ class Action(str, Enum):
     DENY = "DENY"
 
 class Rule(BaseModel):
-    id: str = Field(..., description="Unique identifier for the rule")
+    id: Optional[str] = Field(None, description="Unique identifier for the rule")
     priority: int = Field(..., description="Priority of the rule (higher number = higher priority)")
     source: str = Field(..., description="Source IP, CIDR, or ANY")
     destination: str = Field(..., description="Destination IP, CIDR, or ANY")
