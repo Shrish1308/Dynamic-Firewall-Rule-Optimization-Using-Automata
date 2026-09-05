@@ -8,11 +8,11 @@ function AutomatonGraph({ automaton }) {
   if (!automaton) return null;
   const { states, transitions, initial_state, accepting_states, dead_states } = automaton;
 
-  // Assign x/y positions in a horizontal flow
-  const step = Math.max(90, 560 / Math.max(states.length, 1));
+  // Assign x/y positions in a horizontal flow with increased spacing
+  const step = 160; 
   const positions = {};
   states.forEach((s, i) => {
-    positions[s] = { x: 40 + i * step, y: 100 };
+    positions[s] = { x: 60 + i * step, y: 160 }; // Increased y-position to leave space for arcs
   });
 
   const stateColor = (s) => {
@@ -22,39 +22,50 @@ function AutomatonGraph({ automaton }) {
     return 'var(--clr-border-2)';
   };
 
-  const width = 40 + states.length * step + 40;
+  const width = 60 + states.length * step + 60;
+  
+  // Track occurrences of transitions to prevent overlapping paths/text
+  const transitionCounts = {};
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <svg width={width} height={220} style={{ fontFamily: 'var(--font-mono)' }}>
+    <div style={{ overflowX: 'auto', paddingBottom: '20px' }}>
+      <svg width={width} height={320} style={{ fontFamily: 'var(--font-mono)' }}>
         {/* Transitions */}
         {transitions.map((t, i) => {
           const from = positions[t.from];
           const to   = positions[t.to];
           if (!from || !to) return null;
+          
+          const pairKey = [t.from, t.to].sort().join('-');
+          if (!transitionCounts[pairKey]) transitionCounts[pairKey] = 0;
+          const count = transitionCounts[pairKey]++;
+          
           const isSelf  = t.from === t.to;
-          const midX    = (from.x + to.x) / 2;
-          const midY    = from.y - 40;
+          const dist = Math.abs(states.indexOf(t.to) - states.indexOf(t.from));
+          
+          // Determine arc height and direction
+          const direction = states.indexOf(t.to) < states.indexOf(t.from) ? 1 : -1;
+          const arcHeight = isSelf ? 50 + count * 20 : 30 + dist * 25 + count * 20;
+          const midX = (from.x + to.x) / 2;
+          const midY = isSelf ? from.y - arcHeight : from.y + direction * arcHeight;
+          
           return (
             <g key={i}>
               {isSelf ? (
-                <path d={`M${from.x},${from.y - 18} A22,22 0 1 1 ${from.x + 1},${from.y - 18}`}
+                <path d={`M${from.x - 10},${from.y - 15} C${from.x - 30},${midY - 10} ${from.x + 30},${midY - 10} ${from.x + 10},${from.y - 15}`}
                   fill="none" stroke="var(--clr-border-2)" strokeWidth={1.5} markerEnd="url(#arrow)" />
               ) : (
-                <path d={`M${from.x + 18},${from.y} Q${midX},${midY} ${to.x - 18},${to.y}`}
+                <path d={`M${from.x + (direction === -1 ? 18 : -18)},${from.y} Q${midX},${midY} ${to.x + (direction === -1 ? -18 : 18)},${to.y}`}
                   fill="none" stroke="var(--clr-border-2)" strokeWidth={1.5} markerEnd="url(#arrow)" />
               )}
-              <text x={midX} y={midY - 6} textAnchor="middle" fontSize={9} fill="var(--clr-text-dim)">
-                {t.label}
-              </text>
             </g>
           );
         })}
 
         {/* Arrow marker */}
         <defs>
-          <marker id="arrow" markerWidth={8} markerHeight={8} refX={6} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--clr-border-2)" />
+          <marker id="arrow" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
+            <path d="M0,0 L0,8 L8,4 z" fill="var(--clr-border-2)" />
           </marker>
         </defs>
 
