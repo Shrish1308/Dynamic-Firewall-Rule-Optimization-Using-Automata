@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Play, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { simulatePacket } from '../services/api';
 import { ActionBadge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -48,8 +48,8 @@ export default function Simulator() {
   return (
     <div>
       <div className="page-header">
-        <h1><Play size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Packet Simulator</h1>
-        <p>Enter a packet and trace its path through the firewall rule set.</p>
+        <h1>Packet Simulator</h1>
+        <p>Trace packet paths through rules.</p>
       </div>
 
       {/* Input form */}
@@ -84,7 +84,7 @@ export default function Simulator() {
           </div>
         </div>
         <div style={{ marginTop: 20 }}>
-          <Button id="run-sim-btn" icon={Play} onClick={handleSimulate} disabled={loading}>
+          <Button id="run-sim-btn" onClick={handleSimulate} disabled={loading}>
             {loading ? 'Simulating…' : 'Run Simulation'}
           </Button>
         </div>
@@ -126,7 +126,7 @@ export default function Simulator() {
                   : <XCircle size={16} color="var(--clr-danger)" />
                 }
                 <span className="mono" style={{ color:'var(--clr-accent)' }}>{step.rule_id}</span>
-                <ArrowRight size={12} color="var(--clr-text-dim)" />
+                <span className="mono text-muted" style={{ fontSize:'0.9rem' }}>→</span>
                 <span className="text-sm text-muted">{step.reason}</span>
               </div>
             ))}
@@ -145,7 +145,7 @@ export default function Simulator() {
                         color: state === 'ACCEPT' ? 'var(--clr-success)' : state === 'REJECT' ? 'var(--clr-danger)' : '',
                         borderColor: state === 'ACCEPT' ? 'rgba(52,211,153,0.3)' : state === 'REJECT' ? 'rgba(248,113,113,0.3)' : '',
                       }}>{state}</span>
-                      {i < result.automaton_path.length - 1 && <ArrowRight size={11} color="var(--clr-text-dim)" />}
+                      {i < result.automaton_path.length - 1 && <span className="mono text-muted" style={{ fontSize:'0.9rem' }}>→</span>}
                     </span>
                   ))}
                 </div>

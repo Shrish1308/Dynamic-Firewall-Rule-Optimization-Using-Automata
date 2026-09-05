@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { getRules, createRule, updateRule, deleteRule } from '../services/api';
 import { ActionBadge, ProtocolBadge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -151,10 +151,10 @@ export default function Rules() {
     <div>
       <div className="page-header flex items-center justify-between">
         <div>
-          <h1><Shield size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Firewall Rules</h1>
-          <p>Manage your firewall rule set — create, edit, and delete rules.</p>
+          <h1>Firewall Rules</h1>
+          <p>Create, edit, and delete rules.</p>
         </div>
-        <Button id="add-rule-btn" icon={Plus} onClick={openNew}>Add Rule</Button>
+        <Button id="add-rule-btn" onClick={openNew}>Add Rule</Button>
       </div>
 
       {loading

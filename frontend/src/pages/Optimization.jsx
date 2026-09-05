@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, CheckCircle2, AlertCircle, TrendingDown } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { optimizeRules, getRules } from '../services/api';
 import { ActionBadge, ProtocolBadge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -20,17 +20,15 @@ export default function Optimization() {
   return (
     <div>
       <div className="page-header">
-        <h1><Zap size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Optimization Engine</h1>
-        <p>Generate safe rule-removal recommendations while preserving first-match semantics.</p>
+        <h1>Optimization Engine</h1>
+        <p>Generate safe rule-removal recommendations.</p>
       </div>
 
       <div className="card mb-6" style={{ background: 'rgba(79,142,247,0.04)' }}>
         <p className="text-sm text-muted" style={{ marginBottom: 14 }}>
-          The optimizer analyses your rule set using automata intersection results to identify
-          redundant, shadowed and unreachable rules. It generates conservative recommendations —
-          it never silently removes rules.
+          Identify and remove redundant rules.
         </p>
-        <Button id="run-optimize-btn" icon={Zap} onClick={handleOptimize} disabled={loading}>
+        <Button id="run-optimize-btn" onClick={handleOptimize} disabled={loading}>
           {loading ? 'Optimizing…' : 'Run Optimization'}
         </Button>
       </div>
@@ -39,12 +37,9 @@ export default function Optimization() {
         <>
           {/* Metrics */}
           <div className="stat-grid mb-6">
-            <StatCard title="Original Rules" value={result.original_count}
-              icon={Zap} iconColor="var(--clr-text-muted)" iconBg="rgba(148,163,184,0.1)" />
-            <StatCard title="Optimized Rules" value={result.optimized_count}
-              icon={CheckCircle2} iconColor="var(--clr-success)" iconBg="rgba(52,211,153,0.12)" />
+            <StatCard title="Original Rules" value={result.original_count} />
+            <StatCard title="Optimized Rules" value={result.optimized_count} />
             <StatCard title="Reduction" value={`${result.reduction_percent}%`}
-              icon={TrendingDown} iconColor="var(--clr-accent)" iconBg="rgba(79,142,247,0.12)"
               subtitle={`${result.original_count - result.optimized_count} rules removed`} />
           </div>
 

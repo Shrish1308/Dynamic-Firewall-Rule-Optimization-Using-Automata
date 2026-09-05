@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, AlertTriangle, Zap, Play, BarChart2, GitBranch, ChevronRight } from 'lucide-react';
+import logo from '../assets/logo.png';
 import { StatCard } from '../components/Card';
 import { IssueBadge } from '../components/Badge';
 import { getRules, getAnalysis } from '../services/api';
@@ -25,23 +25,11 @@ export default function Dashboard() {
   return (
     <div>
       {/* Hero */}
-      <div className="hero-banner">
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-            <Shield size={22} color="var(--clr-accent)" />
-            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--clr-accent)', textTransform: 'uppercase', letterSpacing: 1 }}>
-              Dynamic Firewall Rule Optimization
-            </span>
-          </div>
-          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 8 }}>
-            Automata-Powered<br />
-            <span style={{ background: 'linear-gradient(90deg, var(--clr-accent), var(--clr-accent-2))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Firewall Intelligence
-            </span>
-          </h1>
-          <p style={{ color: 'var(--clr-text-muted)', maxWidth: 480 }}>
-            Detect conflicts, shadowed rules and unreachable policies.
-            Visualize automata, simulate packets, and optimize your rule set — all in one place.
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', padding: '10px 0' }}>
+          <img src={logo} alt="FireOptima" style={{ width: 140, height: 140, objectFit: 'contain', marginBottom: 16, borderRadius: 16 }} />
+          <p style={{ color: 'var(--clr-text-muted)', maxWidth: 480, fontSize: '1.1rem' }}>
+            Analyze, simulate, and optimize firewall rules using automata.
           </p>
         </div>
       </div>
@@ -53,15 +41,11 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="stat-grid">
-          <StatCard title="Total Rules" value={rules.length} icon={Shield}
-            iconColor="var(--clr-accent)" iconBg="rgba(79,142,247,0.12)" />
-          <StatCard title="Issues Found" value={totalIssues} icon={AlertTriangle}
-            iconColor="var(--clr-warning)" iconBg="rgba(251,191,36,0.12)"
+          <StatCard title="Total Rules" value={rules.length} />
+          <StatCard title="Issues Found" value={totalIssues} 
             subtitle={`${analysis?.summary.conflict ?? 0} conflict · ${analysis?.summary.shadowed ?? 0} shadow`} />
-          <StatCard title="Unreachable" value={analysis?.summary.unreachable ?? 0} icon={GitBranch}
-            iconColor="var(--clr-accent-2)" iconBg="rgba(167,139,250,0.12)" />
-          <StatCard title="Redundant" value={analysis?.summary.redundancy ?? 0} icon={BarChart2}
-            iconColor="var(--clr-success)" iconBg="rgba(52,211,153,0.12)" />
+          <StatCard title="Unreachable" value={analysis?.summary.unreachable ?? 0} />
+          <StatCard title="Redundant" value={analysis?.summary.redundancy ?? 0} />
         </div>
       )}
 
@@ -69,20 +53,16 @@ export default function Dashboard() {
       <div className="section-title">Quick Actions</div>
       <div className="grid-3 mb-6">
         {[
-          { to: '/rules',     icon: Shield,   label: 'Manage Rules',       desc: 'Add, edit, or delete firewall rules' },
-          { to: '/analysis',  icon: BarChart2,label: 'Run Analysis',        desc: 'Detect conflicts, shadows & redundancy' },
-          { to: '/simulator', icon: Play,     label: 'Simulate Packet',    desc: 'Trace a packet through rule priority order' },
-          { to: '/automata',  icon: GitBranch,label: 'View Automata',      desc: 'Visualize a rule as a DFA state machine' },
-          { to: '/optimize',  icon: Zap,      label: 'Optimize Rules',     desc: 'Get recommendations to reduce rule count' },
-        ].map(({ to, icon: Icon, label, desc }) => (
+          { to: '/rules',     label: 'Manage Rules',       desc: 'Create, edit, or delete rules.' },
+          { to: '/analysis',  label: 'Run Analysis',       desc: 'Find conflicts and redundancy.' },
+          { to: '/simulator', label: 'Simulate Packet',    desc: 'Trace packet paths.' },
+          { to: '/automata',  label: 'View Automata',      desc: 'Visualize DFA state machines.' },
+          { to: '/optimize',  label: 'Optimize Rules',     desc: 'Reduce rule count safely.' },
+        ].map(({ to, label, desc }) => (
           <Link key={to} to={to} style={{ textDecoration: 'none' }}>
             <div className="card" style={{ cursor: 'pointer', transition: 'all 0.15s ease' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--clr-accent)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                <Icon size={18} color="var(--clr-accent)" />
-                <ChevronRight size={14} color="var(--clr-text-dim)" />
-              </div>
               <div style={{ fontWeight: 700, marginBottom: 4 }}>{label}</div>
               <div className="text-sm text-muted">{desc}</div>
             </div>

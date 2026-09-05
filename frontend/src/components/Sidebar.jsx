@@ -1,16 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard, Shield, BarChart2,
-  Zap, Play, GitBranch,
-} from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const NAV_ITEMS = [
-  { to: '/',           label: 'Dashboard',   icon: LayoutDashboard },
-  { to: '/rules',      label: 'Rules',        icon: Shield },
-  { to: '/analysis',   label: 'Analysis',     icon: BarChart2 },
-  { to: '/automata',   label: 'Automata',     icon: GitBranch },
-  { to: '/simulator',  label: 'Simulator',    icon: Play },
-  { to: '/optimize',   label: 'Optimization', icon: Zap },
+  { to: '/',           label: 'Dashboard' },
+  { to: '/rules',      label: 'Rules' },
+  { to: '/analysis',   label: 'Analysis' },
+  { to: '/automata',   label: 'Automata' },
+  { to: '/simulator',  label: 'Simulator' },
+  { to: '/optimize',   label: 'Optimization' },
 ];
 
 export function Sidebar() {
@@ -18,8 +15,8 @@ export function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <Shield size={18} color="#fff" />
+        <div className="sidebar-logo-icon" style={{ background: 'transparent', padding: 0 }}>
+          <img src={logo} alt="FireOptima" style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', display: 'block' }} />
         </div>
         <div className="sidebar-logo-text">
           Fire<span>Optima</span>
@@ -29,14 +26,13 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="sidebar-nav">
         <div className="sidebar-label">Navigation</div>
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+        {NAV_ITEMS.map(({ to, label }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
           >
-            <Icon size={16} />
             {label}
           </NavLink>
         ))}

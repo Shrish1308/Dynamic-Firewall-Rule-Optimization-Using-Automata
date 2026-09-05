@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { GitBranch, ArrowRight } from 'lucide-react';
+
 import { getRules, getAutomaton } from '../services/api';
 import { ProtocolBadge, ActionBadge } from '../components/Badge';
 
@@ -129,8 +129,8 @@ export default function Automata() {
   return (
     <div>
       <div className="page-header">
-        <h1><GitBranch size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Automata Visualizer</h1>
-        <p>Select a rule to inspect its DFA representation. States, transitions, and accept/reject conditions are shown.</p>
+        <h1>Automata Visualizer</h1>
+        <p>Inspect rule DFA representations.</p>
       </div>
 
       <div style={{ display:'grid', gridTemplateColumns:'260px 1fr', gap:20 }}>
@@ -162,8 +162,8 @@ export default function Automata() {
         <div className="card">
           {!selected && (
             <div className="empty-state">
-              <GitBranch size={40} />
-              <p>Select a rule from the list to visualize its automaton.</p>
+
+              <p>Select a rule to view its automaton.</p>
             </div>
           )}
           {selected && loading && (
@@ -183,7 +183,7 @@ export default function Automata() {
                 {automaton.transitions.map((t, i) => (
                   <div key={i} style={{ display:'flex', alignItems:'center', gap:6, fontSize:'0.78rem', padding:'3px 0' }}>
                     <span className="mono" style={{ color:'var(--clr-accent)' }}>{t.from}</span>
-                    <ArrowRight size={10} color="var(--clr-text-dim)" />
+                    <span className="mono text-muted" style={{ fontSize:'0.9rem' }}>→</span>
                     <span className="mono" style={{ color:'var(--clr-accent)' }}>{t.to}</span>
                     <span className="chip" style={{ fontSize:'0.68rem' }}>{t.label}</span>
                   </div>

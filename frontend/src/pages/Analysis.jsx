@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BarChart2, AlertTriangle, Eye } from 'lucide-react';
+
 import { getAnalysis } from '../services/api';
 import { StatCard } from '../components/Card';
 import { IssueBadge } from '../components/Badge';
@@ -34,16 +34,16 @@ export default function Analysis() {
   return (
     <div>
       <div className="page-header">
-        <h1><BarChart2 size={20} style={{ display:'inline', marginRight:8, color:'var(--clr-accent)' }} />Rule Analysis</h1>
-        <p>Automata-based detection of conflicts, shadowing, redundancy and unreachable rules.</p>
+        <h1>Rule Analysis</h1>
+        <p>Detect conflicts, shadowing, and redundancy.</p>
       </div>
 
       {/* Summary stats */}
       <div className="stat-grid">
-        <StatCard title="Total Rules"  value={total_rules}         icon={BarChart2} iconColor="var(--clr-accent)"   iconBg="rgba(79,142,247,0.12)" />
-        <StatCard title="Conflicts"    value={summary.conflict}    icon={AlertTriangle} iconColor="var(--clr-danger)"   iconBg="rgba(248,113,113,0.12)" />
-        <StatCard title="Shadowed"     value={summary.shadowed}    icon={AlertTriangle} iconColor="var(--clr-warning)"  iconBg="rgba(251,191,36,0.12)"  />
-        <StatCard title="Unreachable"  value={summary.unreachable} icon={AlertTriangle} iconColor="var(--clr-accent-2)" iconBg="rgba(167,139,250,0.12)" />
+        <StatCard title="Total Rules"  value={total_rules} />
+        <StatCard title="Conflicts"    value={summary.conflict} />
+        <StatCard title="Shadowed"     value={summary.shadowed} />
+        <StatCard title="Unreachable"  value={summary.unreachable} />
       </div>
 
       {/* Issue list */}
@@ -72,7 +72,6 @@ export default function Analysis() {
                     <div className="text-sm text-muted">{issue.explanation}</div>
                   </div>
                 </div>
-                <Eye size={15} color="var(--clr-text-dim)" />
               </div>
             </div>
           ))}
